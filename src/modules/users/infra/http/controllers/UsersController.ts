@@ -1,0 +1,30 @@
+import { Request, Response } from "express";
+import { instanceToPlain } from 'class-transformer';
+
+import { container } from 'tsyringe';
+import CreateUserService from '@modules/users/services/CreateUserService';
+
+
+export default class UsersController {
+  public async create(request: Request, response: Response): Promise<Response> {
+    const { name, email, password } = request.body;
+
+
+    const createUser = container.resolve(CreateUserService);
+
+    const user = await createUser.execute({
+      name,
+      email,
+      password
+    });
+
+    return response.json({ user: instanceToPlain(user) });
+  }
+
+  // O correto é criar um controller para listar todos os usuários.
+  public async listAllUsers(request: Request, response: Response): Promise<Response> {
+    const controllerUser = container.resolve(CreateUserService);
+    const user = await controllerUser.allUsers();
+    return response.json({ user: instanceToPlain(user) });
+  }
+}
